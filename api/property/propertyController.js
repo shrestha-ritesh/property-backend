@@ -1,18 +1,20 @@
 
-const {addProperty, getProperty, updateProperty, getPropertyId} = require("./propertyService");
+const { addProperty, getProperty, updateProperty, getPropertyId } = require("./propertyService");
+const imageController = require('../../controller/image.controller');
 module.exports = {
     addProperty: (req, res) => {
         const body = req.body;
-        addProperty(body, (error, results) =>{
+        addProperty(body, (error, results) => {
             if (error) {
                 console.log(error);
-            }else{
+            } else {
                 return res.json({
                     success: 1,
                     message: 'Successfully added property !',
                     data: results
                 });
             }
+            imageController.upload;
         });
     },
 
@@ -20,12 +22,12 @@ module.exports = {
         getProperty((error, results) => {
             if (error) {
                 console.log(error);
-            }else if (results.length <= 0) {
+            } else if (results.length <= 0) {
                 res.json({
                     message: "There is no data in table!"
                 });
             }
-            else{
+            else {
                 res.json({
                     success: 1,
                     data: results
@@ -36,7 +38,7 @@ module.exports = {
 
     getPropertyById: (req, res) => {
         const id = req.params.id;
-        getPropertyId (id, (error, results) => {
+        getPropertyId(id, (error, results) => {
             if (error) {
                 console.log(error);
             }
@@ -55,7 +57,7 @@ module.exports = {
 
     updateProperty: (req, res) => {
         const body = req.body;
-        getPropertyId (body.property_id, (error, results)=> {
+        getPropertyId(body.property_id, (error, results) => {
             if (error) {
                 console.log(error);
             }
@@ -66,7 +68,7 @@ module.exports = {
                 })
             }
             console.log(results);
-            updateProperty (body, (error, results) => {
+            updateProperty(body, (error, results) => {
                 if (error) {
                     console.log(error);
                 }
