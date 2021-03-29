@@ -1,20 +1,57 @@
 
-const { addProperty, getProperty, updateProperty, getPropertyId } = require("./propertyService");
+const { addProperty, getProperty, updateProperty, getPropertyId, getPropertyTtitle, addHouse, addApartments } = require("./propertyService");
 const imageController = require('../../controller/image.controller');
 module.exports = {
     addProperty: (req, res) => {
         const body = req.body;
-        addProperty(body, (error, results) => {
+        const id = req.params.id;
+
+        addProperty(id, body, (error, results) => {
+            var changedID = results;
+
             if (error) {
-                console.log(error);
-            } else {
-                return res.json({
-                    success: 1,
-                    message: 'Successfully added property !',
-                    data: results
+                // return console.log(error);
+                return res.status(200).json({
+                    success: 0,
+                    error: 'Successfully added property !!!!!!'
                 });
             }
-            imageController.upload;
+            else if (body.property_type == "House") {
+                addHouse(changedID, body, (error, results) => {
+                    if (error) {
+                        return console.log(error);
+                    }
+                    // res.status(200).json({
+                    //     success: 1,
+                    //     message: 'Successfully added property details !',
+                    //     data: results
+                    // });
+                });
+
+            }
+            else if (body.property_type == "Apartment") {
+                addApartments(changedID, body, (error, results) => {
+                    if (error) {
+                        return console.log(error);
+                    }
+                    // res.status(200).json({
+                    //     success: 1,
+                    //     message: 'Successfully added Apartment details !',
+                    //     data: results
+                    // });
+                });
+
+            }
+
+            else {
+                console.log('Inserted!!!');
+            }
+            return res.status(200).json({
+                success: 1,
+                message: 'Successfully added property !!!!!!',
+                propertyid: results.insertId,
+                data: results
+            });
         });
     },
 

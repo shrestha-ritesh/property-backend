@@ -9,6 +9,6 @@ const router = express.Router();
 router.post('/uploads', checkToken, imageUploader.upload.single('image'), imageController.upload);
 
 //For multiple file:
-router.post('/multipleUploads', checkToken, imageUploader.upload.array('image', 15), imageController.multipleUpload);
+router.post('/multipleUploads/:propertyid', checkToken, imageUploader.upload.array('image', 15), imageController.multipleUpload);
 
 module.exports = router;
