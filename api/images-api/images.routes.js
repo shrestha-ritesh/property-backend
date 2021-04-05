@@ -6,9 +6,16 @@ const { checkToken } = require("../../auth/token_validation");
 //creating router:
 const router = express.Router();
 
-router.post('/uploads', checkToken, imageUploader.upload.single('image'), imageController.upload);
+router.post('/uploads/:propertyid', checkToken, imageUploader.upload.single('image'), imageController.upload);
 
 //For multiple file:
 router.post('/multipleUploads/:propertyid', checkToken, imageUploader.upload.array('image', 15), imageController.multipleUpload);
+// router.post('/multipleUploads', checkToken, imageUploader.upload.array('image', 15), imageController.multipleUpload);
+
+//For Multiple data of image
+router.get('/getimage/:propID', imageController.getImage);
+
+router.get('/getID/:id', imageController.getImageID);
+
 
 module.exports = router;

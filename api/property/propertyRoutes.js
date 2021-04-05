@@ -1,5 +1,5 @@
 const express = require('express');
-const { addProperty, getProperty, getPropertyById, updateProperty } = require('./propertyController');
+const { addProperty, getProperty, getPropertyById, updateProperty, getPropertyDetails } = require('./propertyController');
 
 const router = express.Router();
 
@@ -10,7 +10,10 @@ const { checkToken } = require("../../auth/token_validation");
 router.post("/addProperty/:id", checkToken, addProperty);
 
 //For getting the property data
-router.get("/getProperty", checkToken, getProperty);
+router.get("/getProperty", getProperty);
+
+
+router.get("/getPropertyDetails", getPropertyDetails);
 
 // getting based on id
 router.get("/getid/:id", getPropertyById);

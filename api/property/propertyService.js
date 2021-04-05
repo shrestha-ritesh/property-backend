@@ -80,17 +80,31 @@ module.exports = {
     },
 
 
-    getProperty: (callBack) => {
-        pool.query(`SELECT * FROM PROPERTY`,
-            [],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
+    getProperty() {
+        return new Promise((resolve, reject) => {
+            pool.query(`SELECT * FROM PROPERTY`,
+                [],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
+                    }
+                    resolve(results);
                 }
-                return callBack(null, results);
-            }
-        )
+            )
+        })
     },
+
+    // getProperty: (callBack) => {
+    //     pool.query(`SELECT * FROM PROPERTY`,
+    //         [],
+    //         (error, results) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     )
+    // },
 
     getPropertyId: (id, callBack) => {
         pool.query(
@@ -117,6 +131,7 @@ module.exports = {
                 return callBack(null, results[0]);
             }
         );
+
     },
 
     updateProperty: (data, callBack) => {

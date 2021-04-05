@@ -15,5 +15,37 @@ module.exports = {
                 console.log('Successfully Inserted !!! ');
                 return callBack(null, results);
             });
+    },
+
+    getImageData: (property_id) => {
+        return new Promise((resolve, reject) => {
+            console.log(property_id);
+            pool.query(
+                `SELECT * FROM IMAGES WHERE property_id = ?`,
+                [property_id],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
+                    }
+                    console.log('Sucessfully Get');
+                    resolve(results);
+                });
+        })
+
+    },
+
+    addMainImageName: (property_id, imageName, callBack) => {
+        pool.query(`UPDATE property SET thumbnail_image = ? WHERE property_id = ?`,
+            [
+                imageName,
+                property_id
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                console.log('Successfully store data !!!!!!!');
+                return callBack(null, results);
+            });
     }
 }
