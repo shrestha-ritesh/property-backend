@@ -1,5 +1,5 @@
 
-const { addProperty, getProperty, updateProperty, getPropertyId, getPropertyTtitle, addHouse, addApartments } = require("./propertyService");
+const { addProperty, getProperty, updateProperty, getPropertyId, getPropertyTtitle, addHouse, addApartments, getApartmentBasedId, getHouseBasedId, getUserPropertyDetail, getPropertyListsBasedId } = require("./propertyService");
 const imageController = require('../../controller/image.controller');
 const { getImageData } = require("../images-api/imageServices");
 const pool = require('../../config/dbconfig');
@@ -130,6 +130,7 @@ module.exports = {
     //For getting detail of evry images with details :
     getPropertyDetails: async (req, res) => {
         const results = [];
+        const data = [];
         const properties = await getProperty();
         if (properties.length <= 0) {
             res.status(200).json({
@@ -143,10 +144,90 @@ module.exports = {
             const imageUrls = images.map(images => {
                 return `http://10.0.2.2:3000/multipropertyimage/${images.image_name}`;
             });
+            //Adding image data in the json for response
             property.images = imageUrls;
+
+            //For Property Details
+            if (property.property_type == "Apartment") {
+                const apsDetail = await getApartmentBasedId(property.property_id);
+                const apsDetailMap = apsDetail.map(apsDetail => {
+                    return apsDetail;
+                });
+                console.log(apsDetailMap);
+                property.other_details = apsDetailMap[0];
+            }
+            if (property.property_type == "House") {
+                const houseDetails = await getHouseBasedId(property.property_id);
+                const houseDetailMap = houseDetails.map(houseDetails => {
+                    return houseDetails;
+                });
+                console.log("This is house details", houseDetailMap);
+                property.other_details = houseDetailMap[0];
+            }
+
+            //For getting the Posted property owner Name:
+            const userDetail = await getUserPropertyDetail(property.property_id);
+            console.log("This is user Detail: ", userDetail);
+            property.user_detail = userDetail[0];
+
+            //Storing the combined data in the List
             results.push(property);
+
         }
         res.send({
+            data: results
+        });
+    },
+
+    //Getting the data for the listed Property:
+
+    getListedPropertyBasedId: async (req, res) => {
+        const user_Id = req.params.userID;
+        const results = [];
+
+        //Calling the method from the service:
+        const propertyDetails = await getPropertyListsBasedId(user_Id);
+        if (propertyDetails.length <= 0) {
+            res.send({
+                success: 0,
+                message: "Something went wrong! "
+            });
+        }
+        for (let i = 0; i < propertyDetails.length; i++) {
+            const property = propertyDetails[i];
+            const images = await getImageData(property.property_id);
+            const imageUrls = images.map(images => {
+                return `http://10.0.2.2:3000/multipropertyimage/${images.image_name}`;
+            });
+            //Adding image data in the json for response
+            property.images = imageUrls;
+
+            //Gettting the apartment or house detail from the server:
+            if (property.property_type == "Apartment") {
+                const apsDetail = await getApartmentBasedId(property.property_id);
+                const apsDetailMap = apsDetail.map(apsDetail => {
+                    return apsDetail;
+                });
+                console.log(apsDetailMap);
+                property.other_details = apsDetailMap[0];
+            }
+            if (property.property_type == "House") {
+                const houseDetails = await getHouseBasedId(property.property_id);
+                const houseDetailMap = houseDetails.map(houseDetails => {
+                    return houseDetails;
+                });
+                console.log("This is house details", houseDetailMap);
+                property.other_details = houseDetailMap[0];
+            }
+
+            const UserDetail = await getUserPropertyDetail(property.property_id);
+            property.user_detail = UserDetail[0];
+
+            results.push(property);
+
+        }
+        res.status(200).send({
+            success: 1,
             data: results
         });
     }

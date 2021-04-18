@@ -1,5 +1,5 @@
 const express = require('express');
-const { addProperty, getProperty, getPropertyById, updateProperty, getPropertyDetails } = require('./propertyController');
+const { addProperty, getProperty, getPropertyById, updateProperty, getPropertyDetails, getListedPropertyBasedId } = require('./propertyController');
 
 const router = express.Router();
 
@@ -20,5 +20,8 @@ router.get("/getid/:id", getPropertyById);
 
 //updating based on id
 router.patch("/update", checkToken, updateProperty);
+
+//getting the listed proerty based on user Id:
+router.get("/getlistedProperty/:userID", getListedPropertyBasedId);
 
 module.exports = router;

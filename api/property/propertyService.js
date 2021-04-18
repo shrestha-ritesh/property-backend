@@ -3,8 +3,8 @@ const pool = require('../../config/dbconfig');
 module.exports = {
     //adding property
     addProperty: (userid, data, callBack) => {
-        pool.query(`insert into property (property_name, property_description, property_price, property_status, property_type, property_address, property_city, property_located_area, built_up_area, property_total_area, property_face, road_distance, road_type, userId)
-            values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        pool.query(`insert into property (property_name, property_description, property_price, property_status, property_type, property_address, property_city, property_located_area, built_up_area, property_total_area, property_face, road_distance, road_type, userId, longitude, latitude)
+            values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.property_name,
                 data.property_description,
@@ -19,7 +19,9 @@ module.exports = {
                 data.property_face,
                 data.road_distance,
                 data.road_type,
-                userid
+                userid,
+                data.longitude,
+                data.latitude
             ],
             (error, results) => {
                 if (error) {
@@ -58,7 +60,7 @@ module.exports = {
     //For adding the different category of property such as ==> Apartments
     //Adding specific property such as HOUSE
     addApartments: (propId, data, callBack) => {
-        pool.query(`insert into apartments (aps_bedroom, aps_room, aps_kitchen, aps_living_room, aps_bathroom, aps_parking, property_id)
+        pool.query(`insert into apartments (bedroom, rooms, kitchen, living_room, bathroom, parking, property_id)
             values(?,?,?,?,?,?,?)`,
             [
                 data.bedroom,
@@ -153,6 +155,65 @@ module.exports = {
                 return callBack(null, results);
             }
         );
-    }
+    },
 
+    getApartmentBasedId(property_id) {
+        return new Promise((resolve, reject) => {
+            pool.query(`SELECT * FROM Apartments WHERE property_id = ?`, [property_id], (error, results) => {
+                if (error) {
+                    console.log(error);
+                    reject(error);
+                }
+                // console.log(results);
+                resolve(results);
+            })
+        });
+    },
+
+    getHouseBasedId(property_id) {
+        return new Promise((resolve, reject) => {
+            pool.query(`SELECT * FROM House WHERE property_id = ?`, [property_id], (error, results) => {
+                if (error) {
+                    console.log(error);
+                    reject(error);
+                }
+                // console.log(results);
+                resolve(results);
+            })
+        });
+    },
+
+    //Query for getting the user based on the property:
+    getUserPropertyDetail(property_id) {
+        return new Promise((resolve, reject) => {
+            pool.query(`SELECT us.userId, us.name, us.email, us.contact_no
+            FROM users us
+            INNER JOIN property prop
+            ON us.userId = prop.userId WHERE prop.property_id = ?`, [property_id], (error, results) => {
+                if (error) {
+                    reject(error);
+                }
+                resolve(results);
+            })
+        });
+    },
+
+    getPropertyListsBasedId(userId) {
+        return new Promise((resolve, reject) => {
+            console.log(userId);
+            pool.query(
+                `SELECT * FROM property WHERE userId = ?`,
+                [
+                    userId
+                ],
+                (error, results) => {
+                    if (error) {
+                        reject(error);
+                    }
+                    resolve(results);
+                }
+
+            );
+        });
+    }
 };

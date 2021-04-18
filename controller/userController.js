@@ -100,6 +100,7 @@ module.exports = {
                             error: "user not found ! ",
                         });
                     }
+
                     console.log('Requested passowrd: ', password);
                     console.log('compared bcrypt data: ', bcrypt.compareSync(password, results[0].password));
                     if (!results || !(await bcrypt.compare(req.body.password, results[0].password))) { // It is used to compare the user provided password with actual password
@@ -129,5 +130,29 @@ module.exports = {
         } catch (error) {
             console.log(error);
         }
-    }
+    },
+
+    //gETTING USER iD based on id for profile
+    getUserProfileDetail: (req, res) => {
+        const user_id = req.params.userId;
+        pool.query(
+            'SELECT userId, name, email, contact_no, reg_date FROM USERS WHERE USERID = ?',
+            [user_id],
+            (error, results) => {
+                if (error) {
+                    console.log(error);
+                }
+                if (results.length <= 0) {
+                    return res.json({
+                        success: 0,
+                        message: "There is no data in db !"
+                    });
+                }
+                return res.json({
+                    success: 1,
+                    data: results,
+                });
+            }
+        );
+    },
 }
