@@ -9,9 +9,14 @@ const inspectionRoutes = require("./api/inspection/inspectionRoutes");
 const saveProperties = require("./api/savedProperties/savedPropertiesRoutes");
 const propertySearch = require("./api/search/searchRoutes");
 const path = require('path');
+const cors = require('cors');
 
 //importing reqiure file:
 const router = require('./routes/routes');
+
+
+//For cross platforms:
+app.use(cors());
 
 //Middleware for parsing the request into json
 app.use(bodyParser.json());
@@ -27,9 +32,10 @@ app.use("/v1/request/", inspectionRoutes);
 app.use("/v1/saveProperties", saveProperties);
 app.use("/v1/search", propertySearch);
 
-//Express static
+//Express static for file hosting
 app.use("/multipropertyimage", express.static(path.join(__dirname, 'frontUploads')));
 
+app.use("/multievidences", express.static(path.join(__dirname, 'evidence')));
 //starting the application:
 const port = process.env.SERVER_PORT;
 app.listen(port, () =>

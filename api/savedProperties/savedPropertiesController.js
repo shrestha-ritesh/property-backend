@@ -45,15 +45,16 @@ module.exports = {
                 error: "Something went wrong while deleting! "
             });
         }
-        res.status(200).json({
-            data: favouritesData,
-        });
+        // res.status(200).json({
+        //     data: favouritesData,
+        // });
     },
 
     getDataForFavourites: async (req, res) => {
         const results = [];
         //Getting the data from the parameter
         const user_Id = req.params.userId;
+        console.log("This is log user ids", user_Id);
         //Calling the service method for getting the data:
         const favDetailData = await getFavouriteData(user_Id);
         //Checking the condition:
@@ -99,10 +100,17 @@ module.exports = {
 
             results.push(property);
 
+
         }
-        res.status(200).json({
-            data: results
-        });
+        if (results.length < 1) {
+            console.log("Data not available");
+        } else {
+            res.status(200).json({
+                success: 1,
+                data: results
+            });
+        }
+
 
     }
 

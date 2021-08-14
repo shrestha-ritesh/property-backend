@@ -4,18 +4,14 @@
 const pool = require('../config/dbconfig');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-
-// exports.register = (req, res) => {
-//     console.log(req.body);
-//     res.send(req.body);
-// }
+const { sendMail } = require('../sendEmail/nodemailer');
 
 module.exports = {
     register: (req, res) => {
         console.log(req.body);
 
         const body = req.body;
-
+        console.log(body.email);
         pool.query(
             'SELECT email FROM users WHERE email = ?',
             [body.email],
@@ -132,6 +128,61 @@ module.exports = {
         }
     },
 
+    //ChangePassword:
+    changePassword: (req, res) => {
+        const user_id = req.params.userId;
+        const body = req.body;
+
+        //Checking the old password:
+        pool.query(
+            `SELECT * FROM USERS WHERE userId = ?`,
+            [
+                user_id
+            ],
+            async (error, results) => {
+                if (error) {
+                    console.log(error);
+                    return res.status(400).json({
+                        success: 0,
+                        error: "something went wrong ! ",
+                    });
+                }
+                // console.log(results);
+                if (results.length <= 0) {
+                    return res.status(400).json({
+                        success: 0,
+                        error: "user not found ! ",
+                    });
+                }
+                if (!results || !(await bcrypt.compare(req.body.oldPassword, results[0].password))) { // It is used to compare the user provided password with actual password
+                    return res.status(400).json({
+                        success: 0,
+                        error: "Old password is incorrect"
+                    });
+                } else {
+                    // console.log(body.newPassword);
+                    let hashedPassword = await bcrypt.hash(body.newPassword, 8);
+                    console.log(hashedPassword, 'This is hashed');
+
+                    pool.query(
+                        `UPDATE USERS SET password = ? WHERE userId = ?`,
+                        [hashedPassword, user_id,],
+                        (error, results) => {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                return res.json({
+                                    success: 1,
+                                    message: 'Successfully Changed !',
+                                })
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    },
+
     //gETTING USER iD based on id for profile
     getUserProfileDetail: (req, res) => {
         const user_id = req.params.userId;
@@ -155,4 +206,49 @@ module.exports = {
             }
         );
     },
+
+    updateUserDetails: async (req, res) => {
+        const body = req.body;
+        const user_id = req.params.userId;
+        pool.query(
+            `UPDATE USERS SET name = ?, email = ?, contact_no = ? WHERE userId = ?`,
+            [
+                body.name,
+                body.email,
+                body.contact_no,
+                user_id
+            ],
+            (error, results) => {
+                if (error) {
+                    res.send({ success: 0, error: "Something went wrong!", });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Successfully saved updated user data!"
+                });
+            }
+        );
+
+    },
+
+    deleteUser: async (req, res) => {
+        const user_id = req.params.userId;
+        console.log("Check!!!!!!! ");
+        pool.query(
+            `DELETE FROM users WHERE userId = ?`,
+            [
+                user_id
+            ],
+            (error, results) => {
+                if (error) {
+                    res.send({ success: 0, error: "Something went wrong!", });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Successfully deleted user data!"
+                });
+            }
+        );
+
+    }
 }

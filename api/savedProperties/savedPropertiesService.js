@@ -54,7 +54,7 @@ module.exports = {
             pool.query(`SELECT prop.* FROM PROPERTY prop
             INNER JOIN favourites fav
             ON fav.property_id = prop.property_id
-            WHERE fav.userId = 11`,
+            WHERE fav.userId = ?`,
                 [
                     userId
                 ],
@@ -64,6 +64,23 @@ module.exports = {
                         reject(error);
                     }
                     console.log("Geted the data");
+                    resolve(results);
+                });
+        });
+    },
+
+    removeSavedProperty: (propertyId) => {
+        return new Promise((resolve, reject) => {
+            pool.query(`DELETE FROM favourites WHERE property_id = ?`,
+                [
+                    propertyId
+                ],
+                (error, results) => {
+                    if (error) {
+                        console.log(error);
+                        reject(error);
+                    }
+                    console.log("removed the data");
                     resolve(results);
                 });
         });

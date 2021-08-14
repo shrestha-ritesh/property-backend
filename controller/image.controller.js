@@ -1,4 +1,4 @@
-const { addImageName, getImageData, addMainImageName } = require("../api/images-api/imageServices");
+const { addImageName, getImageData, addMainImageName, addEvidenceName } = require("../api/images-api/imageServices");
 
 function upload(req, res) {
     var propertyID = req.params.propertyid;
@@ -44,16 +44,16 @@ function multipleUpload(req, res) {
                 if (error) {
                     console.log(error);
                 }
-                res.status(200).json({
-                    success: 1,
-                    message: 'Successfully added image Name !'
-                });
+                // res.status(200).json({
+                //     success: 1,
+                //     message: 'Successfully added image Name !'
+                // });
             });
 
         }
-        // res.status(200).json({
-        //     message: "Image uploaded successfully",
-        // });
+        res.status(200).json({
+            message: "Image uploaded successfully",
+        });
     } else {
         res.status(500).json({
             message: "something went wrong ! ",
@@ -108,6 +108,31 @@ async function getImage(req, res) {
     // });
 }
 
+function postEvidenceData(req, res) {
+    const propId = req.params.propertyid;
+    var fileInfo = req.files;
+    var title = req.body.title;
+    if (fileInfo.length > 0) {
+        for (let index = 0; index < fileInfo.length; index++) {
+            const element = fileInfo[index];
+            console.log("Check", element);
+            addEvidenceName(propId, element, (error, results) => {
+                if (error) {
+                    console.log(error);
+                }
+            });
+        }
+        res.status(200).json({
+            success: 1,
+            message: "SucessFully added image in table"
+        });
+    } else {
+        res.status(500).json({
+            message: "something went wrong ! ",
+            // url: req.file.filename
+        });
+    }
+}
 
 function getImageID(req, res) {
     res.sendFile('C:/FYP/backend/frontUploads/' + req.params.id);
@@ -117,5 +142,6 @@ module.exports = {
     upload: upload,
     multipleUpload: multipleUpload,
     getImageID: getImageID,
-    getImage: getImage
+    getImage: getImage,
+    postEvidenceData: postEvidenceData,
 };
